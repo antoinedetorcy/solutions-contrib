@@ -43,7 +43,6 @@ class MapChart(Chart):
         if legend_min is not None:
             self.min = legend_min
         else:
-            print(series.data)
             self.min = min([x['value'] for x in series.data])
         if legend_max is not None:
             self.max = legend_max
@@ -95,9 +94,13 @@ class GeoDensitySeries(Series):
         self.type = 'map'
         self.map = map_id
 
-class TreeMapSeries(Series):
-    def __init__(self, data, slice_values):
-        # data is either [{name: XX, value : y, children [{name: XX, value : y, ..}]}, ..]
+class GaugeSeries(Series):
+    def __init__(self, value, min_gauge, max_gauge, label=None):
+        if label is not None:
+            data = [{'name' : label, 'value' : value}]
+        else:
+            data = [{'name' : label}]
         Series.__init__(self, data)
-        self.type = 'treemap'
-        self.visibleMin = '300'
+        self.type = 'gauge'
+        self.min = int(min_gauge)
+        self.max = int(max_gauge)

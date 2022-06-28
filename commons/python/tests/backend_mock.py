@@ -69,8 +69,11 @@ with urllib.request.urlopen("https://echarts.apache.org/examples/data/asset/geo/
     geo_json = json.loads(url.read().decode())
 map_chart = gu.MapChart('Map Chart', geo_series, 'world_map', geo_json, graph_subtitle='Population per country')
 
+# Gauge Chart
+gauge_series = gu.GaugeSeries(int(df["Quantity"].agg({'Quantity_mean':'mean'})['Quantity_mean']), df["Quantity"].min(), df["Quantity"].max(), label='Mean Quantity')
+gauge_chart = gu.BaseChart('Gauge Chart', gauge_series,  graph_subtitle='Mean quantity sold')
 
-dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart])
+dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
 
                                           
 @app.route('/getData')
