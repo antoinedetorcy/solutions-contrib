@@ -104,3 +104,25 @@ class GaugeSeries(Series):
         self.type = 'gauge'
         self.min = int(min_gauge)
         self.max = int(max_gauge)
+
+
+def generateStackedSeries(dataframe, name_column, x_column, y_column, aggregation, type=None, limit=50):
+    # get top N elements to comply with the limit 
+    top_n = (dataframe.groupby([name_column], as_index=False)[y_column]
+                            .agg({'agg':aggregation})
+                            .fillna(0)
+                            .sort_values('agg', ascending=False)
+                            .head(limit)[name_column]
+                            .tolist())
+    dataframe.loc[~dataframe[name_column].isin(top_n), name_column] = 'Others'
+
+    df_pivoted = dataframe.pivot_table(index=x_column, columns=name_column, values=y_column, aggfunc=aggregation).fillna(0)
+    series = []
+    x_values = df_pivoted.index.tolist()
+    for column in df_pivoted.columns:
+        if type is not None and type=='line':
+            series.append(LineSeries(list(zip(x_values, df_pivoted[column])), legend_name = column, stack = True))
+        else:
+            series.append(BarSeries(list(zip(x_values, df_pivoted[column])), legend_name = column, stack = True))
+
+    return series

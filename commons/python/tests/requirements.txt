@@ -1,4 +1,5 @@
 https://industry-solutions-design.industries.dataiku-dss.io/public/packages/dataiku-internal-client.tar.gz
+dataiku-api-client
 pandas
 flask
 flask_cors

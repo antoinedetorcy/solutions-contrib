@@ -21,7 +21,7 @@ df = pd.DataFrame({
     'Food' : ['ham', 'eggs', 'eggs', 'fruits'] * 6,
     'Vendor' : ['vendorA', 'vendorB', 'vendorC'] * 8,
     'Date' : [np.random.choice(pd.date_range(datetime.datetime(2013,1,1),datetime.datetime(2013,1,3))) for i in range(24)],
-    'Price' : np.random.randn(24),
+    'Price' : abs(np.random.randn(24)),
     'Quantity' : np.random.randint(2,10,24),
 })
 df["Date"] = df["Date"].astype(str)
@@ -33,6 +33,10 @@ index = df_pivoted.index.tolist()
 for column in df_pivoted.columns:
     per_project_series.append(gu.BarSeries(list(zip(index, df_pivoted[column])), legend_name = column, stack = True))
 stacked_bar_chart = gu.XYChart('Stacked Bar Chart', 'category', 'value', per_project_series, graph_subtitle='Quantity sold per vendor per day')
+
+# Stacked bar chart using generator
+generated_series =gu.generateStackedSeries(df, 'Food', 'Date', 'Price', 'mean', type='bar', limit=2)
+stacked_bar_chart_generator = gu.XYChart('Stacked Bar Chart (with generator)', 'category', 'value', generated_series, graph_subtitle='Mean price per vendor per day')
 
 # Scatter plot
 scatter_series = gu.ScatterSeries(list(zip(df.Price, df.Quantity)))
@@ -73,7 +77,7 @@ map_chart = gu.MapChart('Map Chart', geo_series, 'world_map', geo_json, graph_su
 gauge_series = gu.GaugeSeries(int(df["Quantity"].agg({'Quantity_mean':'mean'})['Quantity_mean']), df["Quantity"].min(), df["Quantity"].max(), label='Mean Quantity')
 gauge_chart = gu.BaseChart('Gauge Chart', gauge_series,  graph_subtitle='Mean quantity sold')
 
-dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
+dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
 
                                           
 @app.route('/getData')
