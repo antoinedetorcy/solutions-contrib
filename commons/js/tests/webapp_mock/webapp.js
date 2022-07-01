@@ -9,7 +9,7 @@ function run(){
     setTimeout(function(){
         $.getJSON(getWebAppBackendUrl('/getData'), function(dashboard) {
             console.log("this is running now");
-            charts_generator.createOrUpdateDashboard(dashboard);
+            charts_generator.createOrUpdateDashboard(dashboard, 'body');
         });
     }, 500);
 

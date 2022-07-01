@@ -1,74 +1,62 @@
 class ChartsGenerator{
     constructor(){
-        this.dashboard_map = new Map();
-        this.charts_map = new Map();
     }
 
-    createOrUpdateDashboard(dashboard) {
-        this.addDashboardTitle(dashboard.title, dashboard.id);
-        
+    createOrUpdateDashboard(dashboard, dom_id) {
+        this.addDashboardTitle(dashboard.title, dashboard.id, dom_id);
         dashboard.charts.forEach(function(chart_data){
-            if (this.charts_map.has(chart_data.id)) {
-                console.log('Updating chart : ' + chart_data.id)
-                updateChart(this.charts_map.get(chart_data.id), chart_data)
-            } else {
-                console.log('Creating chart : ' + chart_data.id)
-                var chart = this.createChart(chart_data);
-                if (chart !== undefined)
-                    this.charts_map.set(chart_data.id, chart)
-                else
-                    console.log('Chart creator is undefined for ' + chart.id)
-            }
+            var chart = this.generateChart(dashboard.id, chart_data);
         }.bind(this));
     }
 
-    addDashboardTitle(title, id) {
-        if (!this.dashboard_map.has(id)) {
-            $('body').append(
+    addDashboardTitle(title, id, dom_id) {
+        if (!document.getElementById(id)) {
+            $(dom_id).append(
                 `<div id="` + id + `" class="dashboard">
                     <div class="title">
                         <h2>` + title + `</h2>
                     </div>
-                    <div id="charts" class="charts">
+                    <div id="` + id + `_charts" class="charts">
                     </div>
                 </div>`
             );
         }
     }
 
-    createChart(chart) {
-        $('#charts').append(
-             `<div class="chart_area">
-                  <div class="chart_container  chart_panel">
-                      <div id="` + chart.id + `" class="chart_data"></div>
-                   </div>
-             </div>`
-        );
+    generateChart(dashboard_id, chart) {
+        var chartId = dashboard_id + '_' + chart.id;
+        if (!document.getElementById(chartId)) {
+            $('#' + dashboard_id + '_charts').append(
+                 `<div class="chart_area">
+                      <div class="chart_container  chart_panel">
+                          <div id="` + chartId + `" class="chart_data"></div>
+                       </div>
+                 </div>`
+            );
+
+            if(chart.type == "MapChart")
+                echarts.registerMap(chart.map_id, { geoJson: chart.geo_json });
+        }
+        var chartDom = document.getElementById(chartId);
+        var eChart = echarts.getInstanceByDom(chartDom) || echarts.init(chartDom);
     
+        var option = {};
         switch (chart.type) {
             case "XYChart":
-                console.log("creating XYChart chart");
-                return this.createXYChart(chart);
-                break;
-            case "BaseChart":
-                console.log("creating BaseChart chart");
-                return this.createBaseChart(chart);
+                option = this.generateXYOption(chart);
                 break;
             case "MapChart":
-                console.log("creating MapChart chart");
-                return this.createMapChart(chart);
+                option = this.generateMapOption(chart);
                 break;
             default:
+                option = this.generateBaseOption(chart);
                 break;
         }
-        return undefined;
-    }
-
-    createBaseChart(chart){
-        console.log(chart);
-        var chartDom = document.getElementById(chart.id);
-        var myChart = echarts.init(chartDom);
         
+        eChart.setOption(option, true);
+    }
+    
+    generateBaseOption(chart){
         var option = {
             title: {
                 text: chart.title,
@@ -87,16 +75,12 @@ class ChartsGenerator{
                 trigger: 'item'
             },
             series: chart.series
-        }
-    
-        myChart.setOption(option);
-        return myChart;
+        };
+        
+        return option;
     }
-    
-    createXYChart(chart){
-        var chartDom = document.getElementById(chart.id);
-        var myChart = echarts.init(chartDom);
-    
+
+    generateXYOption(chart){
         var option = {
             title: {
                 text: chart.title,
@@ -122,18 +106,12 @@ class ChartsGenerator{
                 data: chart.y_axis_values
             }],
             series: chart.series
-        }
-    
-        myChart.setOption(option);
-        return myChart;
+        };
+        
+        return option;
     }
 
-    createMapChart(chart){
-        echarts.registerMap(chart.map_id, { geoJson: chart.geo_json });
-        var chartDom = document.getElementById(chart.id);
-        var myChart = echarts.init(chartDom);
-        
-        console.log("map_id : " + chart.map_id)
+    generateMapOption(chart){
         var option = {
             title: {
                 text: chart.title,
@@ -147,16 +125,9 @@ class ChartsGenerator{
                 calculable: true
             },
             series: chart.series
-        }
-    
-        myChart.setOption(option);
-        return myChart;
-    }
-    
-    updateChart(chart, graphData) {
-       chart.setOption({
-          series: graphData.series
-       });
+        };
+        
+        return option;
     }
 }
 

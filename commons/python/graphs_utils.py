@@ -116,7 +116,7 @@ def generateStackedSeries(dataframe, name_column, x_column, y_column, aggregatio
                             .tolist())
     dataframe.loc[~dataframe[name_column].isin(top_n), name_column] = 'Others'
 
-    df_pivoted = dataframe.pivot_table(index=x_column, columns=name_column, values=y_column, aggfunc=aggregation).fillna(0)
+    df_pivoted = dataframe.pivot_table(index=x_column, columns=name_column, values=y_column, aggfunc=aggregation).fillna(0).round(2) 
     series = []
     x_values = df_pivoted.index.tolist()
     for column in df_pivoted.columns:

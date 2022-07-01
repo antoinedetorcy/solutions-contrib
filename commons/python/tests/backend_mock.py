@@ -77,7 +77,7 @@ map_chart = gu.MapChart('Map Chart', geo_series, 'world_map', geo_json, graph_su
 gauge_series = gu.GaugeSeries(int(df["Quantity"].agg({'Quantity_mean':'mean'})['Quantity_mean']), df["Quantity"].min(), df["Quantity"].max(), label='Mean Quantity')
 gauge_chart = gu.BaseChart('Gauge Chart', gauge_series,  graph_subtitle='Mean quantity sold')
 
-dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
+dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
 
                                           
 @app.route('/getData')
