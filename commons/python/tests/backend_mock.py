@@ -77,7 +77,13 @@ map_chart = gu.MapChart('Map Chart', geo_series, 'world_map', geo_json, graph_su
 gauge_series = gu.GaugeSeries(int(df["Quantity"].agg({'Quantity_mean':'mean'})['Quantity_mean']), df["Quantity"].min(), df["Quantity"].max(), label='Mean Quantity')
 gauge_chart = gu.BaseChart('Gauge Chart', gauge_series,  graph_subtitle='Mean quantity sold')
 
-dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart])
+# Sankey Diagram
+df_sankey = df.groupby(['Vendor', 'Food'])['Quantity'].sum().reset_index()
+sankey_series = gu.SankeySeries(df_sankey['Vendor'].tolist(), df_sankey['Food'].tolist(), df_sankey['Quantity'].tolist())
+sankey_chart = gu.BaseChart('Sankey Chart', sankey_series, graph_subtitle='Quantity sold per Vendor')
+
+# add to dashboard
+dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart, sankey_chart])
 
                                           
 @app.route('/getData')

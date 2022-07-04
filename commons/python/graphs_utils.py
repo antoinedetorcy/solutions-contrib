@@ -105,6 +105,16 @@ class GaugeSeries(Series):
         self.min = int(min_gauge)
         self.max = int(max_gauge)
 
+class SankeySeries(Series):
+    def __init__(self, sources, targets, values):
+        nodeSet = set(sources)
+        nodeSet.update(targets)
+        data = [{'name': item} for item in nodeSet]
+        Series.__init__(self, data)
+        self.type = 'sankey'
+        self.links = [{'source': source, 'target': target, 'value': value} for source, target, value in zip(sources, targets, values)]
+        self.tootlip = { 'trigger': 'item', 'triggerOn': 'mousemove'}
+
 
 def generateStackedSeries(dataframe, name_column, x_column, y_column, aggregation, type=None, limit=50):
     # get top N elements to comply with the limit 
