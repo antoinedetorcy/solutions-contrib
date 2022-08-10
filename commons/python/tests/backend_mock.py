@@ -82,13 +82,26 @@ df_sankey = df.groupby(['Vendor', 'Food'])['Quantity'].sum().reset_index()
 sankey_series = gu.SankeySeries(df_sankey['Vendor'].tolist(), df_sankey['Food'].tolist(), df_sankey['Quantity'].tolist())
 sankey_chart = gu.BaseChart('Sankey Chart', sankey_series, graph_subtitle='Quantity sold per Vendor')
 
-# add to dashboard
-dashboard = gu.Dashboard('Development Dashboard', [stacked_bar_chart, stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart, sankey_chart])
+# HeatMap
+heatmap_chart = gu.generateHeatmapChart(df, 'Vendor', 'Food', 'Quantity', 'mean', 'HeatMap Chart', subtitle='Mean Quantity bought by Vendor')
 
+# Dataset
+dataset = gu.Dataset(df, 'My Dataset')
+
+
+# add to dashboard
+dashboard = gu.Dashboard('Development Dashboard', [dataset, stacked_bar_chart, stacked_bar_chart, stacked_bar_chart_generator, scatter_chart, line_chart, multi_type_chart, pie_chart, donut_chart, map_chart, gauge_chart, sankey_chart, heatmap_chart])
+
+def to_json(o):
+    print(type(o))
+    # np.int64 do not inherit from int so it needs a special handling
+    if isinstance(o, np.int64):
+        return int(o)
+    return o.__dict__
                                           
 @app.route('/getData')
 @cross_origin()
 def getData():
-    return json.dumps(dashboard.__dict__, default=lambda o: o.__dict__, indent=4)
+    return json.dumps(dashboard.__dict__, default=to_json)
 
 app.run(host='0.0.0.0', port=81, debug=True)

@@ -119,3 +119,7 @@
       height: 160px;
       width: 100%;
   }
+  
+  .dataTables_wrapper {
+    font-family: 'SourceSansPro';
+  }
